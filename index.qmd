@@ -1,0 +1,31 @@
+---
+title: "First Project"
+---
+
+## Function practice
+
+See [Functions](functions.qmd) for a runthrough of functions we cover in different chapters.
+
+## My upper dating age
+
+The following section details the [socially-acceptable maximum age of anyone you should date](https://www.psychologytoday.com/us/blog/meet-catch-and-keep/201405/who-is-too-young-or-too-old-you-date).
+
+The math works like this:
+
+- Take your age
+- subtract 7
+- Double the result
+
+```{r}
+# update 21 to your actual age
+age <- 21
+(age - 7) * 2
+```
+
+## Lower dating age
+
+```{r}
+# Using age variable from above
+(age / 2) + 7
+```
+

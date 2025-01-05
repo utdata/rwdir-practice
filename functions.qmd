@@ -1,0 +1,255 @@
+---
+title: "Functions"
+---
+
+## Libraries
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(janitor)
+```
+
+## The data
+
+We'll mostly use the starwars data already in tidyverse.
+
+But sometimes not.
+
+## read
+
+https://bit.ly/jedr-rebels
+
+- clean names
+- assign to an object
+
+[read_csv](https://readr.tidyverse.org/reference/read_delim.html) and the other readr functions work similarly.
+
+```{r}
+rebels <-
+  read_csv("https://bit.ly/jedr-rebels") |> 
+  clean_names()
+```
+
+## glimpse
+
+Lets you peek at all the data variables at once.
+
+```{r}
+starwars |> glimpse()
+```
+
+Can also be ...
+
+```{r}
+glimpse(starwars)
+```
+
+## summary
+
+```{r}
+summary(rebels)
+```
+
+
+## select
+
+This function selects specific columns or variables.
+
+```{r}
+starwars |>
+  select(name, height)
+```
+
+## mutate
+
+### Centemeters to inches
+
+multiply by 2.54
+
+```{r}
+starwars |> 
+  mutate(
+    height_in = height * 2.54,
+    .after = height
+  )
+```
+
+### Convert a date
+
+Uses dmy (day-month-year or whatever the order) from [lubridate](https://lubridate.tidyverse.org/) to make a real data.
+
+```{r}
+rebels |> 
+  mutate(
+    air_date = dmy(original_air_date),
+    .after = original_air_date
+  )
+```
+
+## write
+
+## filter
+
+filter() returns only rows that meet logical criteria you specify.
+
+```{r}
+starwars |> 
+  filter(species == "Human")
+```
+
+```{r}
+starwars |> 
+  filter(height > 200)
+```
+
+```{r}
+starwars |> 
+  filter(str_detect(hair_color, "auburn"))
+```
+
+## summarize
+
+summarize() builds a summary table about your data. You can count rows n() or do math on numerical values, like mean(). In the next chapter we will summarize with math functions.
+ 
+
+```{r}
+starwars |> 
+  summarise(
+    avg_height = mean(height, na.rm = TRUE)
+  )
+```
+
+## group_by with sum, n
+
+group_by() is often used with summarize() to put data into groups before building a summary table based on the groups.
+
+
+```{r}
+starwars |> 
+  group_by(species) |> 
+  summarise(
+    avg_height = mean(height, na.rm = TRUE) |> round_half_up(),
+    numb_chars = n()
+  )
+  
+```
+
+### Rounding test
+
+```{r}
+round(11.5)
+round(12.5)
+
+round_half_up(11.5)
+round_half_up(12.5)
+```
+
+## distinct
+
+distinct() returns rows based on unique values in columns you specify. i.e., it deduplicates data.
+
+```{r}
+starwars |> 
+  distinct(hair_color, eye_color)
+```
+
+## slice
+
+and variates _sample, _max, _min.
+
+```{r}
+starwars |> 
+  slice_sample(n = 4)
+```
+
+```{r}
+starwars |> 
+  select(name, species, mass) |> 
+  group_by(species) |> 
+  slice_max(mass) 
+
+```
+
+
+## case categories
+
+Creating simplified variables using case_ functions as tests.
+
+### case_match
+
+When you look at a specific column/variable and make changes based on those values.
+
+```{r}
+starwars |> 
+  mutate(
+    species_simple = case_match(
+      species,
+      "Human" ~ "Human",
+      .default = "Other"
+    )
+  ) |> 
+  select(name, starts_with("species"))
+```
+
+
+### case_when
+
+When you need more complicated logic that might look at more than one column (though this doesn't.)
+
+```{r}
+starwars |> 
+  mutate(
+   species_simple = case_when(
+     species == "Human" ~ "Human",
+     species == "Droid" ~ "Droid",
+     .default = "Other"
+   )
+  ) |> 
+  select(name, starts_with("species"))
+```
+
+
+
+## c
+
+```{r}
+species_short <- 
+  c(
+    "Human",
+    "Droid"
+  )
+
+starwars |> 
+  filter(species %in% species_short) |> 
+  select(name, species)
+```
+
+
+## nrow
+
+```{r}
+starwars |> nrow()
+```
+
+---
+
+
+> at this point I dunno if we do in class anymore?
+
+## ggplot
+
+## reorder
+
+## pivot
+
+pivot_wider and pivot_longer?
+
+```{r}
+starwars |> 
+  select(name, films) |> unnest(films)
+```
+
