@@ -3,7 +3,6 @@ project:
   render:
   - "01*.qmd"
   - "*.qmd"
-  output-dir: docs
 
 website:
   title: "Function practice"

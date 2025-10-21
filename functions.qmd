@@ -7,7 +7,6 @@ title: "Functions"
 ```{r}
 #| label: setup
 #| message: false
-#| warning: false
 
 library(tidyverse)
 library(janitor)
@@ -15,14 +14,17 @@ library(janitor)
 
 ## The data
 
-We'll mostly use the starwars data already in tidyverse.
+We'll mostly use the `starwars` data already in tidyverse.
 
-But sometimes not.
+But sometimes `starwars` does not have a data type we need, so we bring in another data set we call `rebels` which is a list of episodes from "Star Wars: Rebels (TV Series 2014-2018)".
 
 ## read
 
-https://bit.ly/jedr-rebels
+We keep a copy of the data at https://bit.ly/jedr-rebels in the [JedR Academy](https://github.com/utdata/jedr-academy) project.
 
+To use it we need to:
+
+- import it
 - clean names
 - assign to an object
 
