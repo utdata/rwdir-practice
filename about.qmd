@@ -7,11 +7,12 @@ title: "About"
 ![](https://journalism.utexas.edu/sites/default/files/styles/faculty_bio_image/public/faculty-jou-mcdonald.jpg)
 
 I'm an Associate Professor of Practice in the School of Journalism & Media in
-the Moody College of Communication at the University of Texas at Austin. I'm also the Innovation Director for the Dallas Morning News Journalism Innovation Endowment.
+the Moody College of Communication at the University of Texas at Austin. I'm also the Innovation Director for the Dallas Morning News Journalism Innovation Endowment, which supports experiential learning projects in the Media Innovation Group.
 
 I like:
 
 - Soccer, especially Austin FC
 - Music, especially NWOBHM.
 - Making beer
+- Coding in R
 - SCUBA diving

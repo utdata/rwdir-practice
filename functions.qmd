@@ -1,6 +1,10 @@
 ---
-title: "Functions"
+title: "JedR training"
 ---
+
+Here we introduce and review functions using the [starwars characters](https://dplyr.tidyverse.org/reference/starwars.html) dataset.
+
+The idea is once you are used to the data, you can concentrate on how the functions work.
 
 ## Libraries
 
@@ -16,27 +20,19 @@ library(janitor)
 
 We'll mostly use the `starwars` data already in tidyverse.
 
-But sometimes `starwars` does not have a data type we need, so we bring in another data set we call `rebels` which is a list of episodes from "Star Wars: Rebels (TV Series 2014-2018)".
+Be sure to note films, vehicles & starships. We'll ignore these for the most part.
 
-## read
+## JedR: Training Module 1
 
-We keep a copy of the data at https://bit.ly/jedr-rebels in the [JedR Academy](https://github.com/utdata/jedr-academy) project.
+We'll review some functions and introduce others during this first day.
 
-To use it we need to:
-
-- import it
-- clean names
-- assign to an object
-
-[read_csv](https://readr.tidyverse.org/reference/read_delim.html) and the other readr functions work similarly.
+### Print dataframe
 
 ```{r}
-rebels <-
-  read_csv("https://bit.ly/jedr-rebels") |> 
-  clean_names()
+starwars
 ```
 
-## glimpse
+### glimpse
 
 Lets you peek at all the data variables at once.
 
@@ -50,51 +46,90 @@ Can also be ...
 glimpse(starwars)
 ```
 
-## summary
+
+### select
+
+This function selects specific columns or variables. There are many different ways you can specify which columns to keep or drop.
+
+#### select specific variables
+
+We can name which columns to keep:
 
 ```{r}
-summary(rebels)
+starwars |> select(name, mass)
 ```
 
+#### select with range
 
-## select
+Or a range of columns in order.
 
-This function selects specific columns or variables.
+```{r}
+starwars |> select(name:mass)
+```
+
+#### select by order
+
+Or by order of the columns ...
+
+```{r}
+starwars |> select(1, 3)
+```
+
+#### select with function
+
+There are many special helper functions to grab variables based on their name. Paying attention to how you name your variables can help you take advantage of this:
+
+```{r}
+starwars |> select(name, ends_with("color"))
+```
+
+#### select to drop
+
+We can drop one variable with ! or -
+
+```{r}
+starwars |> select(!name)
+```
+
+And even a range of columns
+
+```{r}
+starwars |> select(!name:mass)
+```
+
+But if the variables are not contiguous (in order together) then we have to use `c()`:
+
+```{r}
+starwars |> select(!c(name, mass))
+```
+
+### c to concatenate
+
+Concatenate means to join together. `c()` specifies a collection of things.
+
+```{r}
+species_short <- 
+  c(
+    "Human",
+    "Droid"
+  )
+
+starwars |> 
+  filter(species %in% species_short) |> 
+  select(name, species)
+```
+
+### summary
+
+We use the select here to avoid having the lists because they make the summary display wonky. Usually we would pipe directly into summary.
 
 ```{r}
 starwars |>
-  select(name, height)
+  select(name:species) |> 
+  summary()
 ```
 
-## mutate
-
-### Centemeters to inches
-
-multiply by 2.54
-
-```{r}
-starwars |> 
-  mutate(
-    height_in = height * 2.54,
-    .after = height
-  )
-```
-
-### Convert a date
-
-Uses dmy (day-month-year or whatever the order) from [lubridate](https://lubridate.tidyverse.org/) to make a real data.
-
-```{r}
-rebels |> 
-  mutate(
-    air_date = dmy(original_air_date),
-    .after = original_air_date
-  )
-```
-
-## write
-
-## filter
+### filter
 
 filter() returns only rows that meet logical criteria you specify.
 
@@ -113,7 +148,39 @@ starwars |>
   filter(str_detect(hair_color, "auburn"))
 ```
 
-## summarize
+
+### mutate
+
+#### Centemeters to inches
+
+multiply by 2.54
+
+```{r}
+starwars |> 
+  mutate(
+    height_in = height * 2.54,
+    .after = height
+  )
+```
+
+
+## JedR: Training Module 2
+
+### Rounding
+
+The `round()` function in R does not work the way we would expect it to. Instead of rouding up to the next number, it rounds to the nearest even number.
+
+So we use `round_half_up()` that comes with the janitor library.
+
+```{r}
+round(11.5)
+round(12.5)
+
+round_half_up(11.5)
+round_half_up(12.5)
+```
+
+### summarize
 
 summarize() builds a summary table about your data. You can count rows n() or do math on numerical values, like mean(). In the next chapter we will summarize with math functions.
  
@@ -125,63 +192,102 @@ starwars |>
   )
 ```
 
-## group_by with sum, n
+#### GSA with n
 
 group_by() is often used with summarize() to put data into groups before building a summary table based on the groups.
 
+```{r}
+starwars |> 
+  group_by(species) |> 
+  summarise(numb_chars = n()) |> 
+  arrange(desc(numb_chars))
+```
+
+#### GSA with sum
 
 ```{r}
 starwars |> 
   group_by(species) |> 
   summarise(
-    avg_height = mean(height, na.rm = TRUE) |> round_half_up(),
-    numb_chars = n()
+    numb_chars = n(),
+    avg_height = mean(height, na.rm = TRUE) |> round_half_up()
   )
-  
 ```
 
-### Rounding test
-
-```{r}
-round(11.5)
-round(12.5)
-
-round_half_up(11.5)
-round_half_up(12.5)
-```
-
-## distinct
+### distinct
 
 distinct() returns rows based on unique values in columns you specify. i.e., it deduplicates data.
+
+There are 87 characters in the data, but when we run distinct on eye and hair color, we find there are only 34 combinations of those two variables.
+
+This is not a replacement for group_by or filter or select.
 
 ```{r}
 starwars |> 
   distinct(hair_color, eye_color)
 ```
 
-## slice
+### slice
 
-and variates _sample, _max, _min.
+Slice is sort of like filter, but ... not. It lets you index rows by location.
+
+```{r}
+starwars |> 
+  slice(1:2)
+```
+
+#### slice_sample
+
+But there are many useful tidyverse variations
 
 ```{r}
 starwars |> 
   slice_sample(n = 4)
 ```
 
+#### slice_max, slice_min
+
+This allows you to select a row based on value in the data.
+
+```{r}
+starwars |> 
+  slice_max(mass, n = 2)
+```
+
+
+#### slice with group_by
+
+If you group first, slice will be applied within those groups.
+
+This finds the heaviest person in each species.
+
 ```{r}
 starwars |> 
   select(name, species, mass) |> 
   group_by(species) |> 
   slice_max(mass) 
-
 ```
 
+## JedR: Training Module 3
 
-## case categories
+### nrow
+
+This sometimes comes in handy to save variables for printing in Markdown.
+
+```{r}
+starwars |> nrow()
+
+char_rows <- starwars |> nrow()
+```
+
+The number of characters in the data: `r char_rows`.
+
+
+### case tests
 
 Creating simplified variables using case_ functions as tests.
 
-### case_match
+#### case_match
 
 When you look at a specific column/variable and make changes based on those values.
 
@@ -197,8 +303,7 @@ starwars |>
   select(name, starts_with("species"))
 ```
 
-
-### case_when
+#### case_when
 
 When you need more complicated logic that might look at more than one column (though this doesn't.)
 
@@ -214,44 +319,133 @@ starwars |>
   select(name, starts_with("species"))
 ```
 
+### count
 
-
-## c
+See the special extra chapter in rwdir, but here is an example:
 
 ```{r}
-species_short <- 
-  c(
-    "Human",
-    "Droid"
-  )
-
 starwars |> 
-  filter(species %in% species_short) |> 
+  count(species, sort = T, name = "number_characters")
+```
+
+
+### Pivot
+
+#### pivot wider
+
+These examples are a little harder to contrive with the starwars data, but we'll try.
+
+First, we'll count our characters by species and gender.
+
+```{r}
+sw_gen <- starwars |> 
+  count(species, gender) |> 
+  drop_na(species) # removes rows with no species
+
+sw_gen
+```
+
+Now, let's say we want to rearrange this so there is a column for each gender value, one for "masculine", one for "feminine", etc.
+
+We have to specify from which variable to make the new columns, and then from where to grab values.
+
+```{r}
+sw_gen_wide <- sw_gen |> 
+  pivot_wider(names_from = gender, values_from = n)
+
+sw_gen_wide |> remove_empty()
+```
+
+#### pivot longer
+
+Now we flip this longer so there is a row for each species and gender.
+
+```{r}
+sw_gen_wide |> 
+  pivot_longer(cols = !species, names_to = "gender", values_to = "cnt")
+```
+
+## JedR: Training unknown
+
+
+### separate by delimiter
+
+### separate_longer
+
+[separate longer](https://tidyr.tidyverse.org/reference/separate_longer_delim)
+
+Split the multiple values in skin_color and then count them. The `skin_color` variable starts with values like "white, blue".
+
+```{r}
+starwars |> 
+  select(species, skin_color) |> 
+  separate_longer_delim(skin_color, delim = ",") |> 
+  count(species, skin_color)
+
+```
+
+### separate_wider
+
+With [separate wider](https://tidyr.tidyverse.org/reference/separate_wider_delim.html), we are splitting values into new variables.
+
+Again, it is hard to contrive an example with starwars. We have to find a specific set of data to show it without errors.
+
+First we find Droids with two-part names so we can separate by the dash.
+
+```{r}
+sw_dash <- starwars |>
+  filter(str_detect(name, "-"), species == "Droid") |>
   select(name, species)
+
+sw_dash
 ```
 
-
-## nrow
+And now we separate those names into two columns. We use an argument to keep the original column and then move it back to the front.
 
 ```{r}
-starwars |> nrow()
+sw_dash |> 
+  separate_wider_delim(name, delim = "-", names = c("first", "second"), cols_remove = F) |> 
+  relocate(name)
 ```
 
----
+## JedR: Training with Rebels
 
+### read
 
-> at this point I dunno if we do in class anymore?
+Sometimes `starwars` does not have a data type we need, so we bring in another data set we call `rebels` which is a list of episodes from "Star Wars: Rebels (TV Series 2014-2018)".
 
-## ggplot
+We keep a copy of the data at https://bit.ly/jedr-rebels in the [JedR Academy](https://github.com/utdata/jedr-academy) project.
 
-## reorder
+To use it we need to:
 
-## pivot
+- import it
+- clean names
+- assign to an object
 
-pivot_wider and pivot_longer?
+[read_csv](https://readr.tidyverse.org/reference/read_delim.html) and the other readr functions work similarly.
 
 ```{r}
-starwars |> 
-  select(name, films) |> unnest(films)
+rebels <-
+  read_csv("https://bit.ly/jedr-rebels") |> 
+  clean_names()
 ```
+
+### Convert a date
+
+Uses dmy (day-month-year or whatever the order) from [lubridate](https://lubridate.tidyverse.org/) to make a real data.
+
+```{r}
+rebels |> 
+  mutate(
+    air_date = dmy(original_air_date),
+    .after = original_air_date
+  )
+```
+
+## JedR: ggplot
+
+Nope ... don't have one.
+
+
+
 
